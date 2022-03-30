@@ -1,0 +1,64 @@
+---
+name: Super Linter
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    branches: [master, main]
+
+jobs:
+  build:
+    name: Lint Code Base
+    runs-on: self-hosted
+
+    container:
+      image: 894702234348.dkr.ecr.ap-southeast-2.amazonaws.com/github/super-linter:slim-latest
+      env:
+        ORG_READONLY: ${{ secrets.PUBLIC_REPO_RO }}
+
+    # Skip any PR created by dependabot to avoid permission issues
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Set Org Read Only Access
+        run: |
+          git config --global url."https://${ORG_READONLY}:@git.health.nsw.gov.au/".insteadOf "https://git.health.nsw.gov.au/"
+
+      - name: Lint Code Base
+        run: /action/lib/linter.sh
+        env:
+          VALIDATE_ALL_CODEBASE: true
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_DOMAIN: git.health.nsw.gov.au
+          LINTER_RULES_PATH: /
+          MARKDOWN_CONFIG_FILE: .markdownlint.yml
+          VALIDATE_TERRAFORM_TERRASCAN: false
+          VALIDATE_JSCPD: false
+          VALIDATE_PYTHON_ISORT: false
+
+  semgrep:
+    name: Semgrep Terraform Community Style Guide
+    runs-on: [self-hosted]
+
+    container:
+      image: 894702234348.dkr.ecr.ap-southeast-2.amazonaws.com/returntocorp/semgrep-agent:v1
+
+    # Skip any PR created by dependabot to avoid permission issues
+    if: (github.actor != 'dependabot[bot]')
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Checkout Semgrep Rules
+        uses: actions/checkout@v2
+        with:
+          repository: 'ehnsw-terraform/roadmap'
+          path: .semgrep-rules
+          token: ${{ secrets.PUBLIC_REPO_RO }}
+
+      - name: semgrep-agent
+        run: semgrep-agent --config auto --config .semgrep-rules/semgrep/

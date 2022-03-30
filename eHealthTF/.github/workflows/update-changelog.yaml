@@ -1,0 +1,30 @@
+---
+name: Update Changelog
+
+# yamllint disable-line rule:truthy
+on:
+  release:
+    types: [released]
+
+jobs:
+  update:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          ref: master
+
+      - name: Update Changelog
+        uses: ehnsw-actions/changelog-updater-action@v1
+        with:
+          release-notes: ${{ github.event.release.body }}
+          latest-version: ${{ github.event.release.name }}
+
+      - name: Commit updated CHANGELOG
+        uses: ehnsw-actions/git-auto-commit-action@v4
+        with:
+          branch: master
+          commit_message: Update CHANGELOG
+          file_pattern: CHANGELOG.md

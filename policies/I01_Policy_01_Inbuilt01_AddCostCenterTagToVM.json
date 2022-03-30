@@ -1,0 +1,82 @@
+{
+    "properties": {
+     "displayName": "I01-PC01-NSCCAZ-Add Cost Center Tag to VM and Disk",
+     "policyType": "Custom",
+     "mode": "All",
+     "description": "Adds the specified tag and value when any VM and Disk missing this tag is created or updated. Existing VM and Disks can be remediated by triggering a remediation task. If the tag exists with a different value it will not be changed.",
+     "metadata": {
+      "category": "NSCC-Custom",
+      "createdBy": "4ff04a5d-ac1d-4609-aa71-2b9947e18f34",
+      "createdOn": "2021-11-14T04:20:00.5692481Z",
+      "updatedBy": null,
+      "updatedOn": null
+     },
+     "parameters": {
+      "i01-pc01-costcenter-tagname": {
+       "type": "String",
+       "metadata": {
+        "displayName": "i01-pc01-CostCenter-TagName",
+        "description": "Name of the tag, such as 'environment'"
+       },
+       "defaultValue": "Cost Center"
+      },
+      "i01-pc01-costcenter-tagvalue": {
+       "type": "String",
+       "metadata": {
+        "displayName": "i01-pc01-CostCenter-TagValue",
+        "description": "Value of the tag, such as 'production'"
+       },
+       "defaultValue": "12345"
+      },
+      "i01-pc01-costcenter-tag-effect": {
+        "type": "String",
+         "metadata": {
+          "displayName": "i01-pc01-CostCenter-Tag Effect",
+          "description": "i01-pc01-CostCenter-Tag Effect, Modify or Appened"
+        },
+        "allowedValues": [
+          "modify",
+          "appened"
+        ],
+        "defaultValue": "modify"
+      }
+     },
+     "policyRule": {
+      "if": {
+       "allOf": [
+        {
+          "anyOf": [
+            {
+              "field": "type",
+              "equals": "Microsoft.Compute/virtualMachines"
+             },
+            {
+              "field": "type",
+              "equals": "Microsoft.Compute/disks"
+            }
+          ]
+        },        
+        {
+         "field": "[concat('tags[', parameters('i01-pc01-costcenter-tagname'), ']')]",
+         "exists": "false"
+        }
+       ]
+      },
+      "then": {
+       "effect": "[parameters('i01-pc01-costcenter-tag-effect')]",
+       "details": {
+        "roleDefinitionIds": [
+         "/providers/microsoft.authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c"
+        ],
+        "operations": [
+         {
+          "operation": "add",
+          "field": "[concat('tags[', parameters('i01-pc01-costcenter-tagname'), ']')]",
+          "value": "[parameters('i01-pc01-costcenter-tagvalue')]"
+         }
+        ]
+       }
+      }
+     }
+    }
+   }

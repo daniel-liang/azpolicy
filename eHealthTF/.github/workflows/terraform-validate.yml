@@ -1,0 +1,60 @@
+---
+name: Terraform Checks
+
+# yamllint disable-line rule:truthy
+on:
+  pull_request:
+    branches: [master, main]
+
+  workflow_dispatch:
+
+jobs:
+  validation:
+    name: Terraform Validation
+    runs-on: [self-hosted]
+
+    container:
+      image: 894702234348.dkr.ecr.ap-southeast-2.amazonaws.com/hashicorp/terraform:latest
+      env:
+        GIT_TOKEN: ${{ secrets.PUBLIC_REPO_RO }}
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Terraform Init
+        run: |
+          git config --global url."https://${GIT_TOKEN}:@git.health.nsw.gov.au/".insteadOf "https://git.health.nsw.gov.au/"
+          terraform init
+      - name: Terraform Validate
+        run: terraform validate
+        id: terraform_validate
+
+      - name: Terraform fmt
+        run: terraform fmt -check -diff -recursive
+        id: terraform_fmt
+
+      - name: Check versions.tf
+        run: echo "::set-output name=VERSION_OUTPUT::$(grep -cE "provider \"azurerm\"" versions.tf )"
+        id: check_versions
+
+      - name: Ensure versions.tf follows style guide and best practise
+        id: validate_versions
+        run: echo "${{ steps.check_versions.outputs.VERSION_OUTPUT }}" | grep 0
+
+  docs:
+    name: Terraform Docs
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Render terraform docs inside the README.md and push changes back to PR branch
+        uses: ehnsw-actions/terraform-docs@v0.11.0
+        with:
+          working-dir: .
+          output-file: README.md
+          output-method: inject
+          git-push: "true"

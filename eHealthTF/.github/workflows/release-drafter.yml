@@ -1,0 +1,21 @@
+---
+name: Release Drafter
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches: [master, main]
+  pull_request:
+    types: [closed]
+
+jobs:
+  update_release_draft:
+    runs-on: self-hosted
+    if: github.event.pull_request.merged == true
+    steps:
+      - name: Define GitHealth as target
+        run: echo "GHE_HOST=git.health.nsw.gov.au" >> "${GITHUB_ENV}"
+
+      - uses: ehnsw-actions/release-drafter@v5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

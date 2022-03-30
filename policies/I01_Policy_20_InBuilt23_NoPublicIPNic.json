@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "displayName": "I01-PC20-NSCC-Network interfaces should not have Public IPs",
+    "policyType": "Custom",
+    "mode": "Indexed",
+    "description": "This policy denies the network interfaces which are configured with any public IP. Public IP addresses allow internet resources to communicate inbound to Azure resources, and Azure resources to communicate outbound to the internet. This should be reviewed by the network security team.",
+    "metadata": {
+      "version": "1.0.0",
+      "category": "NSCC-Custom"
+    },
+    "parameters": {},
+    "policyRule": {
+      "if": {
+        "allOf": [
+          {
+            "field": "type",
+            "equals": "Microsoft.Network/networkInterfaces"
+          },
+          {
+            "not": {
+              "field": "Microsoft.Network/networkInterfaces/ipconfigurations[*].publicIpAddress.id",
+              "notLike": "*"
+            }
+          }
+        ]
+      },
+      "then": {
+        "effect": "deny"
+      }
+    }
+  }
+}
