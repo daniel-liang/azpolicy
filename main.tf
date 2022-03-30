@@ -5,8 +5,6 @@ locals {
 
 module "azure_policies_01" {
   #source   = "git::https://git.health.nsw.gov.au/ehnsw-terraform/module-azure-policy-definition.git?ref=v1.0.2"
-  #source = "./eHealthTF"
-  #source   = "./eHealthTF"
   source = "git::https://github.com/daniel-liang/tfmodule?ref=v1.0.0"
   for_each = local.files
 
