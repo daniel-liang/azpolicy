@@ -60,4 +60,3 @@ terraform destroy
 | <a name="input_policy_definition_values"></a> [policy_definition_values](#input_policy_definition_values) | Map of dynamic values in the policy definitions                           | `map(any)` | n/a                               |   yes    |
 
 ## Outputs
-
