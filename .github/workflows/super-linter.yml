@@ -19,7 +19,7 @@ jobs:
           fetch-depth: 0
 
       - name: Lint Code Base
-        uses: ehnsw-actions/actions-super-linter@latest
+        uses: github/super-linter@v4
         env:
           VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
