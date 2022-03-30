@@ -22,7 +22,7 @@ jobs:
         env:
           VALIDATE_ALL_CODEBASE: true
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_DOMAIN: git.health.nsw.gov.au
+          #GITHUB_DOMAIN: git.health.nsw.gov.au
           MARKDOWN_CONFIG_FILE: .markdownlint.json
           LINTER_RULES_PATH: /
           VALIDATE_JSCPD: false
