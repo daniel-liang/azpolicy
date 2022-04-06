@@ -26,7 +26,7 @@
         "displayName": "i01-pc01-CostCenter-TagValue",
         "description": "Value of the tag, such as 'production'"
        },
-       "defaultValue": "123"
+       "defaultValue": "456"
       },
       "i01-pc01-costcenter-tag-effect": {
         "type": "String",
